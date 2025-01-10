@@ -721,7 +721,8 @@ def lookml_view_from_dbt_model(
             )
         return join_list
 
-    if len(array_models) > 0:
+    #also based on argument parser --skip_repeated_explore
+    if len(array_models) > 0 and not models.SkipExplore.skip_explore:
         logging.info(f"{model.name} explore view definition")
 
         hidden = "yes"
