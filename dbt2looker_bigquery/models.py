@@ -250,3 +250,4 @@ class DbtManifest(BaseModel):
 
 class SkipExplore():
     skip_explore = False        
+
