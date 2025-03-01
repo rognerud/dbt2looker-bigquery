@@ -274,14 +274,15 @@ class DbtMetaLookerRecipe(BaseModel):
     # TODO: include and exclude filters should be implemented as regex filters on the column names
     # TODO: include and exclude fields should be implemented as exact matches on the column names
     data_type: Optional[str] = None
+    tag_filter: Optional[str] = None
     include_filter: Optional[str] = None
     exclude_filter: Optional[str] = None
     include_fields: Optional[List[str]] = None
     exclude_fields: Optional[List[str]] = None
     measures: Optional[List[DbtMetaLookerRecipeMeasureGroup]] = None
     group_label: Optional[str] = None
-    tags: Optional[List[str]] = None
-    description_addendum: Optional[str] = None
+    tag_add: Optional[List[str]] = None
+    description_add: Optional[str] = None
     value_format_name: Optional[LookerValueFormatName] = Field(default=None)
     html: Optional[str] = None
     hidden: Optional[bool] = None
