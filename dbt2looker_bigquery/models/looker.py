@@ -157,7 +157,10 @@ class DbtMetaLookerDerivedMeasure(DbtMetaLookerMeasure):
     # in addition the sql should be somewhat parseable (;; enforcement, ${} inclusion required etc)
     # this will have to occur at the end of model parsing, as we need to know all the objects in the model
     # failures to validate the sql, should return a warning, or error depending on the validation severity
-    sql: str
+    function: str
+    x: str
+    y: str
+    # * / + - % safe_divide
 
 
 class DbtMetaLookerDerivedDimension(DbtMetaLookerDimension):
@@ -250,20 +253,38 @@ class DbtMetaLookerRecipeMeasureGroup(BaseModel):
 
 
 class DbtMetaLookerRecipe(BaseModel):
-    """A recipe for what to generate automatically in Looker
-    for a given data type in looker, we generate a set of measures
+    """
+    A recipe for what to generate automatically in Looker
+    - data_type: the type of data this recipe is for
+    - include_filter: a regex filter for column names to include
+    - exclude_filter: a regex filter for column names to exclude
+    - include_fields: a list of column names to include
+    - exclude_fields: a list of column names to exclude
+    - measures: a list of DbtMetaLookerRecipeMeasureGroup objects to generate
+    - group_label: a label for the selected dimensions
+    - tags: a list of tags to apply to the selected dimensions
+    - description_addendum: a description to add to the selected dimensions
+    - value_format_name: a value format to use for the selected dimensions
+    - html: a html value to use for the selected dimensions
+    - hidden: a flag to hide the selected dimensions
     that are useful for that data
     """
 
     # TODO: this needs to write first, and be overwritten by actual measures
     # TODO: include and exclude filters should be implemented as regex filters on the column names
     # TODO: include and exclude fields should be implemented as exact matches on the column names
-    data_type: str
+    data_type: Optional[str] = None
     include_filter: Optional[str] = None
     exclude_filter: Optional[str] = None
     include_fields: Optional[List[str]] = None
     exclude_fields: Optional[List[str]] = None
     measures: Optional[List[DbtMetaLookerRecipeMeasureGroup]] = None
+    group_label: Optional[str] = None
+    tags: Optional[List[str]] = None
+    description_addendum: Optional[str] = None
+    value_format_name: Optional[LookerValueFormatName] = Field(default=None)
+    html: Optional[str] = None
+    hidden: Optional[bool] = None
 
 
 class DbtMetaLooker(BaseModel):

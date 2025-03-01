@@ -119,3 +119,12 @@ class LookmlMeasureGenerator:
                 )
 
         return lookml_measures
+
+    def lookml_measures_from_recipe(
+        self,
+        recipe,
+        column_list: list[DbtModelColumn],
+        is_main_view: bool,
+        view: dict = None,
+    ) -> list:
+        """Generate measures from model."""
