@@ -160,6 +160,11 @@ class Cli:
             help="Experimental: Define the catalog parser to use. Default is 'CATALOG', options ['DATABASE', 'CATALOG']",
             default="CATALOG",
         )
+        parser.add_argument(
+            "--recipe-file",
+            help="Path to the recipe file",
+            type=str,
+        )
         parser.set_defaults(
             build_explore=True, write_output=True, hide_arrays_and_structs=True
         )
@@ -217,6 +222,9 @@ class Cli:
             os.path.join(args.target_dir, "manifest.json")
         )
 
+        if args.recipe_file:
+            self.get_recipes(args)
+
         if args.typing_source == "DATABASE":
             logging.debug("Using database as typing source, skipping catalog.json")
             raw_catalog = None
@@ -237,6 +245,7 @@ class Cli:
             logging.getLogger().setLevel(args.log_level)
 
             models = self.parse(args)
+
             self.generate(args, models)
 
             for msg, cat, _, _ in captured_warnings:

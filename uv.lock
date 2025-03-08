@@ -191,7 +191,7 @@ wheels = [
 
 [[package]]
 name = "dbt2looker-bigquery"
-version = "0.23.4"
+version = "0.23.6"
 source = { editable = "." }
 dependencies = [
     { name = "datamodel-code-generator" },

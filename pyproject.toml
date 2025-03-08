@@ -6,7 +6,19 @@ requires_python = ">=3.12"
 readme = "README.md"
 homepage = "https://github.com/rognerud/dbt2looker-bigquery"
 repository = "https://github.com/rognerud/dbt2looker-bigquery"
-dependencies = [ "lkml>=1.1", "pydantic>=2.9", "PyYAML>=5.0", "typing-extensions>=4.0", "importlib-metadata>=4", "rich>=13.9.4", "pytest-mock>=3.14.0", "datamodel-code-generator>=0.26.3", "pre-commit>=4.0.1", "google-cloud-bigquery>=3.29.0", "pytest-cov>=6.0.0",]
+dependencies = [
+ "lkml>=1.1",
+ "pydantic>=2.9",
+ "pyyaml>=5.0",
+ "typing-extensions>=4.0",
+ "importlib-metadata>=4",
+ "rich>=13.9.4",
+ "pytest-mock>=3.14.0",
+ "datamodel-code-generator>=0.26.3",
+ "pre-commit>=4.0.1",
+ "google-cloud-bigquery>=3.29.0",
+ "pytest-cov>=6.0.0",
+]
 
 [uv]
 requires_python = ">=3.12"
