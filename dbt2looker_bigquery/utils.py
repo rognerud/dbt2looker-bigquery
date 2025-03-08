@@ -1,8 +1,12 @@
 import json
+import yaml
 import logging
-
+import re
 from dbt2looker_bigquery.exceptions import CliError
-from dbt2looker_bigquery.models.dbt import DbtModel
+from dbt2looker_bigquery.models.dbt import DbtModel, DbtModelColumn
+from dbt2looker_bigquery.models.looker import DbtMetaLookerDimension
+from dbt2looker_bigquery.models.recipes import CookBook, Recipe, RecipeFilter
+from typing import List, Optional
 
 
 def strip_model_name(model_name: str) -> str:
@@ -18,7 +22,7 @@ def strip_model_name(model_name: str) -> str:
 
 
 class FileHandler:
-    def read(self, file_path: str, is_json=True) -> dict:
+    def read(self, file_path: str, file_type="json") -> dict:
         """Load file from disk. Default is to load as a JSON file
 
         Args:
@@ -29,7 +33,12 @@ class FileHandler:
         """
         try:
             with open(file_path, "r") as f:
-                raw_file = json.load(f) if is_json else f.read()
+                if file_type == "json":
+                    raw_file = json.load(f)
+                elif file_type == "yaml":
+                    raw_file = yaml.safe_load(f)
+                else:
+                    raw_file = f.read()
         except FileNotFoundError as e:
             logging.error(
                 f"Could not find file at {file_path}. Use --target-dir to change the search path for the manifest.json file."
@@ -218,3 +227,104 @@ class StructureGenerator:
             if not matched:
                 raise Exception(f"Could not find a match for column {column.name}")
         return grouped_data
+
+
+class RecipeMixer:
+    def __init__(self, cookbook: CookBook):
+        self.cookbook = cookbook
+
+    def merge_recipes(base: Recipe, override: Recipe) -> Recipe:
+        """
+        Merge two Recipe objects, with override having priority over base.
+        """
+        if override.name:
+            base.name = override.name
+
+        if override.filters:
+            base.filters = base.filters or []
+            base.filters.extend(override.filters)
+
+        if override.actions:
+            base.actions = base.actions or []
+            base.actions.extend(override.actions)
+
+        if override.measures:
+            base.measures = base.measures or []
+            base.measures.extend(override.measures)
+
+        return base
+
+    def is_filter_relevant(
+        filter: RecipeFilter, field_name: str, data_type: str, tags: List[str]
+    ) -> bool:
+        """
+        Check if a filter is relevant for the given field_name, data_type, and tags.
+        """
+        if filter.data_type and filter.data_type != data_type:
+            return False
+
+        if filter.regex_include and not re.match(filter.regex_include, field_name):
+            return False
+
+        if filter.regex_exclude and re.match(filter.regex_exclude, field_name):
+            return False
+
+        if filter.tags and not any(tag in filter.tags for tag in tags):
+            return False
+
+        if filter.fields_include and field_name not in filter.fields_include:
+            return False
+
+        if filter.fields_exclude and field_name in filter.fields_exclude:
+            return False
+
+        return True
+
+    def create_mixture(
+        self, field_name: str, data_type: str, tags: List[str]
+    ) -> Optional[Recipe]:
+        """
+        Combine relevant recipes from cookbook based on field_name, data_type, and tags.
+        """
+        combined_recipe = Recipe()
+
+        for recipe in self.cookbook.recipes:
+            relevant_filters = [
+                f
+                for f in recipe.filters or []
+                if self.is_filter_relevant(f, field_name, data_type, tags)
+            ]
+            if relevant_filters:
+                if not combined_recipe.actions:
+                    combined_recipe.actions = []
+                if not combined_recipe.measures:
+                    combined_recipe.measures = []
+
+                combined_recipe = self.merge_recipes(combined_recipe, recipe)
+
+        return (
+            combined_recipe
+            if combined_recipe.name
+            or combined_recipe.filters
+            or combined_recipe.actions
+            or combined_recipe.measures
+            else None
+        )
+
+    def _merge_models(
+        model_a: DbtMetaLookerDimension, model_b: DbtMetaLookerDimension
+    ) -> DbtMetaLookerDimension:
+        """Merge the data, with model_b's fields taking precedence"""
+        merged_data = {**model_a.model_dump(), **model_b.model_dump()}
+        return DbtMetaLookerDimension(**merged_data)
+
+    def apply_mixture(self, column: DbtModelColumn) -> DbtModelColumn:
+        """
+        Create a mixture for a column and apply it.
+        go through the recipes in the cookbook and apply the relevant ones to the column
+        """
+        mixture = self.create_mixture(column.name, column.data_type, column.tags)
+        if mixture:
+            if mixture.actions:
+                column = self._merge_models(mixture.actions, column)
+        return column

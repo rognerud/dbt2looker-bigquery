@@ -6,7 +6,9 @@ from dbt2looker_bigquery.models.dbt import DbtCatalog, DbtManifest, DbtModel
 from dbt2looker_bigquery.parsers.catalog import CatalogParser
 from dbt2looker_bigquery.parsers.exposure import ExposureParser
 from dbt2looker_bigquery.parsers.model import ModelParser
+from dbt2looker_bigquery.parsers.recipe import RecipeParser
 from dbt2looker_bigquery.utils import strip_model_name
+from dbt2looker_bigquery.utils import RecipeMixer
 
 import warnings
 from dbt2looker_bigquery.warnings import CatalogWarning
@@ -15,7 +17,13 @@ from dbt2looker_bigquery.warnings import CatalogWarning
 class DbtParser:
     """Main DBT parser that coordinates parsing of manifest and catalog files."""
 
-    def __init__(self, raw_manifest: Dict, raw_catalog: Dict, args: Dict = None):
+    def __init__(
+        self,
+        raw_manifest: Dict,
+        raw_catalog: Dict,
+        args: Dict = None,
+        cookbook: Dict = None,
+    ):
         """Initialize the parser with raw manifest and catalog data."""
 
         if hasattr(args, "select") and hasattr(args, "prefilter") and args.prefilter:
@@ -36,6 +44,11 @@ class DbtParser:
             self._catalog_parser = CatalogParser(catalog=self._catalog)
 
         self._exposure_parser = ExposureParser(self._manifest)
+
+        if cookbook:
+            self._cookbook = RecipeMixer(RecipeParser(cookbook))
+        else:
+            self._cookbook = None
 
     def filter_before_pydantic(
         self, raw_manifest: Dict, select_model: List[str]
@@ -93,4 +106,13 @@ class DbtParser:
                 f"Not all models were materialized {nodes_without_catalogue}",
                 CatalogWarning,
             )
+
+        if self._cookbook:
+            for model in processed_models:
+                transformed_columns = [
+                    self._cookbook.apply_mixture(dimension)
+                    for dimension in model.columns
+                ]
+                model.columns = transformed_columns  # Update the model's columns with transformed values
+
         return processed_models

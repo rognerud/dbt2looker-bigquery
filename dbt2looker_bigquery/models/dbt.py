@@ -143,6 +143,7 @@ class DbtModelColumn(BaseModel):
 
     name: str
     description: Optional[str] = None
+    tags: List[str] = []
     data_type: Optional[str] = None  # added later from catalog
     inner_types: list[str] = []  # added later from catalog
     meta: Optional[DbtModelColumnMeta] = DbtModelColumnMeta()

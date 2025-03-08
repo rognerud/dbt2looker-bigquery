@@ -2,26 +2,25 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from dbt2looker_bigquery.enums import (
     # LookerJoinType,
-    LookerMeasureType,
-    # LookerRelationshipType,
     LookerValueFormatName,
 )
 
 
-class RecipeMeasure(BaseModel):
-    """A recipe for what to generate automatically in Looker"""
+# class RecipeMeasure(BaseModel):
+#     """A recipe for what to generate automatically in Looker"""
 
-    type: LookerMeasureType
-    custom_label_prefix: Optional[str] = None
-    hidden: Optional[bool] = None
+#     type: LookerMeasureType
+#     hidden: Optional[bool] = None
+#     value_format_name: Optional[LookerValueFormatName] = Field(default=None)
 
 
 class RecipeAction(BaseModel):
     """a recipe action"""
 
     group_label: Optional[str] = None
-    tag_add: Optional[List[str]] = None
-    description: Optional[str] = None
+    tag_append: Optional[List[str]] = None
+    description_append: Optional[str] = None
+    description_prepend: Optional[str] = None
     value_format_name: Optional[LookerValueFormatName] = Field(default=None)
     html: Optional[str] = None
     hidden: Optional[bool] = None
@@ -50,7 +49,7 @@ class Recipe(BaseModel):
     name: Optional[str] = None
     filters: Optional[List[RecipeFilter]] = None
     actions: Optional[List[RecipeAction]] = None
-    measures: Optional[List[RecipeMeasure]] = None
+    # measures: Optional[List[RecipeMeasure]] = None
 
 
 class CookBook(BaseModel):

@@ -223,7 +223,9 @@ class Cli:
         )
 
         if args.recipe_file:
-            self.get_recipes(args)
+            raw_cookbook = self._file_handler.read(args.recipe_file, file_type="yaml")
+        else:
+            raw_cookbook = None
 
         if args.typing_source == "DATABASE":
             logging.debug("Using database as typing source, skipping catalog.json")
@@ -233,7 +235,7 @@ class Cli:
                 os.path.join(args.target_dir, "catalog.json")
             )
 
-        parser = DbtParser(raw_manifest, raw_catalog, args)
+        parser = DbtParser(raw_manifest, raw_catalog, args, raw_cookbook)
         return parser.get_models(args)
 
     def run(self):
