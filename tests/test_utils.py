@@ -18,7 +18,7 @@ def test_file_read_non_json():
     file_path = "test_file.txt"
     with open(file_path, "w") as f:
         f.write("test data")
-    assert file_handler.read(file_path, is_json=False) == "test data"
+    assert file_handler.read(file_path, file_type=None) == "test data"
     os.remove(file_path)
 
 

@@ -1,0 +1,7 @@
+recipes:
+  - name: merk-id-felt
+    actions:
+      group_label: Id-felt
+      sql: $/60.0;;
+    filters:
+      regex_include: '_id$'

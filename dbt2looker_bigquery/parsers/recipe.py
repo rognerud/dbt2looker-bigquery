@@ -8,16 +8,9 @@ class RecipeParser:
         self._cookbook = cookbook
         self.recipes = None
 
-    def load_and_parse_recipes(self):
+    def load(self):
         # Load the YAML content
-        try:
-            self.recipes = CookBook(**self._cookbook)
-            return self.recipes
-        except (ValueError, TypeError) as e:
-            print(f"Validation error: {e}")
-
-
-# Usage example
-if __name__ == "__main__":
-    parser = RecipeParser("recipes.yml")
-    parser.load_and_parse_recipes()
+        self.recipes = CookBook(**self._cookbook)
+        if len(self.recipes.recipes) == 0:
+            raise ValueError("No recipes found in the cookbook")
+        return self.recipes

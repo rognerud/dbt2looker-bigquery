@@ -46,7 +46,7 @@ class DbtParser:
         self._exposure_parser = ExposureParser(self._manifest)
 
         if cookbook:
-            self._cookbook = RecipeMixer(RecipeParser(cookbook))
+            self._cookbook = RecipeMixer(RecipeParser(cookbook).load())
         else:
             self._cookbook = None
 
@@ -109,10 +109,10 @@ class DbtParser:
 
         if self._cookbook:
             for model in processed_models:
-                transformed_columns = [
-                    self._cookbook.apply_mixture(dimension)
-                    for dimension in model.columns
-                ]
+                transformed_columns = {}
+                for column in model.columns.values():
+                    dimn = self._cookbook.apply_mixture(column)
+                    transformed_columns[column.name] = dimn
                 model.columns = transformed_columns  # Update the model's columns with transformed values
 
         return processed_models

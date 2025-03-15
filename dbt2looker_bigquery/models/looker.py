@@ -16,6 +16,7 @@ class DbtMetaLookerBase(BaseModel):
     label: Optional[str] = None
     hidden: Optional[bool] = None
     description: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class DbtMetaLookerMeasureFilter(BaseModel):
@@ -106,13 +107,6 @@ class DbtMetaLookerDimension(DbtMetaLookerViewElement):
     meta:
         looker:
             dimension:
-                hidden: True
-                label: "Blog Info"
-                group_label: "Blog Info"
-                description: "Blog Info"
-                value_format_name: decimal_0
-                filters:
-                    - path: "/blog%"
 
     """
 
@@ -126,6 +120,40 @@ class DbtMetaLookerDimension(DbtMetaLookerViewElement):
     allow_fill: Optional[bool] = Field(default=None)
     render_as_image: Optional[bool] = Field(default=False)
     required_access_grants: Optional[List[str]] = Field(default=None)
+
+    tag_append: Optional[List[str]] = None
+    description_append: Optional[str] = None
+    description_prepend: Optional[str] = None
+
+    # @model_validator(mode="before")
+    # def handle_parent_data(cls, values):
+    #     description = values.get('description')
+    #     tags = values.get('tags')
+
+    #     # if not description or not tags:
+    #     #     current = values.get('parent')
+
+    #     #     for _ in range(2):
+    #     #         if current:
+    #     #             if not description and current.description:
+    #     #                 description = current.description
+    #     #             if not tags and current.tags:
+    #     #                 tags = current.tags
+    #     #             current = current.parent
+
+    #     if description:
+    #         prepend = values.get("description_prepend", "")
+    #         append = values.get("description_append", "")
+    #         values['description'] = f"{prepend} {description} {append}".strip()
+
+    #     if tags is None:
+    #         tags = []
+    #     append_tags = values.get("tag_append", [])
+    #     if append_tags:
+    #         values['tags'] = list(dict.fromkeys(tags + append_tags))
+    #     else:
+    #         values['tags'] = tags
+    #     return values
 
     @field_validator("timeframes", mode="before")
     def check_enums(cls, values):
