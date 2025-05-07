@@ -171,7 +171,7 @@ class DbtModelColumn(BaseModel):
     def set_primary_key(cls, values):
         constraints = values.get("constraints", [])
 
-        if {"type": "primary_key"} in constraints:
+        if 'primary_key' in map(lambda x: x.get('type'), constraints):
             logging.debug("Found primary key constraint on %s model", values["name"])
             values["is_primary_key"] = True
 
