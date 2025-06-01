@@ -76,7 +76,11 @@ class LookmlViewGenerator:
         views = []
         grouped_columns = self._structure_generator.process_model(model)
 
-        base_view = {"name": model.name}
+        base_view = (
+            {"name": model.name}
+            if not self._cli_args.prefix
+            else {"name": f"{self._cli_args.prefix}_{model.name}"}
+        )
         self._applier.apply_meta_attributes(
             base_view, model, ["label"], "meta.looker.view"
         )

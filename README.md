@@ -69,6 +69,7 @@ options:
   --prefilter           Experimental: add this flag to prefilter the manifest.json file before parsing for --select
   --typing-source TYPING_SOURCE, -ts TYPING_SOURCE
                         Experimental: Define the catalog parser to use. Default is 'CATALOG', options ['DATABASE', 'CATALOG']
+  --prefix              Experimental: add a string to prefix all generated views with this string
 ```
 
 ## primary keys

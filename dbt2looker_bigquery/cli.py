@@ -159,6 +159,12 @@ class Cli:
             help="Experimental: Define the catalog parser to use. Default is 'CATALOG', options ['DATABASE', 'CATALOG']",
             default="CATALOG",
         )
+        parser.add_argument(
+            "--prefix",
+            help="Experimental: add a string to prefix all generated views with this string",
+            type=str,
+            default=None,
+        )
         parser.set_defaults(
             build_explore=True, write_output=True, hide_arrays_and_structs=True
         )

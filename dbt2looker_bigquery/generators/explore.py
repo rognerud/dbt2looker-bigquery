@@ -29,10 +29,8 @@ class LookmlExploreGenerator:
 
         return result
 
-    def generate_joins(self, model: DbtModel, structure):
+    def generate_joins(self, base_name: str, structure):
         join_list = []
-
-        base_name = model.name
 
         for key, _ in structure.items():
             depth = key[0]
@@ -67,10 +65,14 @@ class LookmlExploreGenerator:
     ) -> dict:
         """Create the explore definition."""
         # default behavior is to hide the view
-
+        base_name = (
+            model.name
+            if self._cli_args.prefix is None
+            else f"{self._cli_args.prefix}_{model.name}"
+        )
         # Create explore
         explore = {
-            "name": model.name,
+            "name": base_name,
             "hidden": "yes",
         }
         self._applier.apply_meta_attributes(explore, model, ["description"], "")
@@ -87,7 +89,7 @@ class LookmlExploreGenerator:
         grouped_columns = self._structure_generator.process_model(model)
 
         # if joins exist we need to explore them
-        if joins := self.generate_joins(model, grouped_columns):
+        if joins := self.generate_joins(base_name, grouped_columns):
             explore["joins"] = joins
             return explore
         else:

@@ -43,6 +43,7 @@ def cli_args():
         folder_structure="BIGQUERY_DATASET",
         remove_prefix_from_dataset="",
         hide_arrays_and_structs=False,
+        prefix=None,
     )
 
 
