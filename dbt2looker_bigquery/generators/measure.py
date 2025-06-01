@@ -43,7 +43,7 @@ class LookmlMeasureGenerator:
         ):
             # looker does not support date and datetime types as measures
             # so we need to implement them directly in bigquery
-            type = "number"
+            type = "string"
             if measure.type.value == LookerMeasureType.COUNT.value:
                 sql = f"COUNT({sql})"
             elif measure.type.value == LookerMeasureType.COUNT_DISTINCT.value:

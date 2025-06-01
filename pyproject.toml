@@ -1,6 +1,6 @@
 [project]
 name = "dbt2looker-bigquery"
-version = "0.23.8"
+version = "0.23.9"
 description = "Generate lookml view files from dbt models for Bigquery"
 requires_python = ">=3.12"
 readme = "README.md"
