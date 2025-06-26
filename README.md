@@ -1,3 +1,6 @@
+# Discontinued. If you are interested in easier loading of data and formatting it automatically you should instead check out
+https://github.com/rognerud/looker-loader
+
 # dbt2looker-bigquery
 
 Use `dbt2looker-bigquery` to generate Looker view files automatically from dbt models in Bigquery.
